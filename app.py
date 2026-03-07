@@ -1,16 +1,55 @@
 import streamlit as st
 import pandas as pd
+import os
 
-# cargar dataset
+# -----------------------
+# Cargar dataset
+# -----------------------
+
 df = pd.read_csv("sbbl_players.csv")
 
+# -----------------------
+# Cargar fecha actualización
+# -----------------------
+
+if os.path.exists("last_update.txt"):
+    with open("last_update.txt") as f:
+        last_update = f.read()
+else:
+    last_update = "desconocida"
+
+# -----------------------
+# Estadísticas
+# -----------------------
+
+total_teams = df["team"].nunique()
+total_players = df["player"].nunique()
+
+# -----------------------
+# UI
+# -----------------------
+
 st.title("Detector de Equipos SBBL")
+
+st.caption(
+    f"Equipos: {total_teams} | Jugadores: {total_players} | "
+    f"Última actualización: {last_update}"
+)
 
 st.write("Pega una lista de jugadores (uno por línea)")
 
 texto = st.text_area("Jugadores")
 
-min_jugadores = st.slider("Jugadores mínimos para detectar equipo", 2, 6, 3)
+min_jugadores = st.slider(
+    "Jugadores mínimos para detectar equipo",
+    min_value=2,
+    max_value=6,
+    value=3
+)
+
+# -----------------------
+# Análisis
+# -----------------------
 
 if st.button("Analizar"):
 
@@ -19,7 +58,9 @@ if st.button("Analizar"):
     df_temp = df.copy()
     df_temp["player_lower"] = df_temp["player"].str.lower()
 
-    coincidencias = df_temp[df_temp["player_lower"].isin([j.lower() for j in lista])]
+    coincidencias = df_temp[
+        df_temp["player_lower"].isin([j.lower() for j in lista])
+    ]
 
     resultado = (
         coincidencias
@@ -35,7 +76,8 @@ if st.button("Analizar"):
 
     st.subheader("Equipos detectados")
 
-    if len(resultado) == 0:
-        st.write("No se detectaron equipos.")
+    if resultado.empty:
+        st.warning("No se detectaron equipos.")
     else:
-        st.dataframe(resultado)
+        resultado = resultado.sort_values("total", ascending=False)
+        st.dataframe(resultado, use_container_width=True)
