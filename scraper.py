@@ -2,12 +2,17 @@ import cloudscraper
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
+import random
 from tqdm import tqdm
 from datetime import datetime
 
 START_TEAM = 1
 END_TEAM = 200
-DELAY = 0.1
+
+DELAY_MIN = 3
+DELAY_MAX = 6
+
+MAX_RETRIES = 3
 
 print("Iniciando scraping...")
 
@@ -22,7 +27,7 @@ scraper.headers.update({
     "Referer": "https://sbbl.es/"
 })
 
-# visitar la home primero para generar cookies
+# visitar home primero para generar cookies
 scraper.get("https://sbbl.es")
 
 data = []
@@ -31,12 +36,22 @@ for team_id in tqdm(range(START_TEAM, END_TEAM + 1)):
 
     url = f"https://sbbl.es/equipos/{team_id}"
 
-    try:
-        response = scraper.get(url, timeout=10)
-    except:
-        continue
+    response = None
 
-    if response.status_code != 200:
+    for attempt in range(MAX_RETRIES):
+
+        try:
+            response = scraper.get(url, timeout=15)
+
+            if response.status_code == 200:
+                break
+
+        except Exception as e:
+            print(f"Error en equipo {team_id}, intento {attempt+1}")
+
+        time.sleep(5)
+
+    if response is None or response.status_code != 200:
         continue
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -60,7 +75,9 @@ for team_id in tqdm(range(START_TEAM, END_TEAM + 1)):
             "player": player
         })
 
-    time.sleep(DELAY)
+    # delay aleatorio para evitar bloqueo
+    delay = random.uniform(DELAY_MIN, DELAY_MAX)
+    time.sleep(delay)
 
 print("Jugadores encontrados:", len(data))
 
