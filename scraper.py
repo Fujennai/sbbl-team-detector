@@ -5,9 +5,11 @@ import time
 from tqdm import tqdm
 from datetime import datetime
 
-BASE_URL = "https://sbbl.es"
+START_TEAM = 1
+END_TEAM = 200
+DELAY = 0.1
 
-print("Iniciando scraper...")
+print("Iniciando scraping...")
 
 scraper = cloudscraper.create_scraper()
 
@@ -17,50 +19,20 @@ scraper.headers.update({
     "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
     "Connection": "keep-alive",
     "Upgrade-Insecure-Requests": "1",
-    "Referer": BASE_URL
+    "Referer": "https://sbbl.es/"
 })
 
-# visitar la home primero
-scraper.get(BASE_URL)
-
-# ------------------------------------------------
-# 1️⃣ Obtener lista de equipos
-# ------------------------------------------------
-
-print("Buscando equipos...")
-
-response = scraper.get(f"{BASE_URL}/equipos")
-
-soup = BeautifulSoup(response.text, "html.parser")
-
-team_links = soup.select("a[href^='/equipos/']")
-
-team_ids = set()
-
-for link in team_links:
-    href = link.get("href")
-    try:
-        team_id = int(href.split("/")[-1])
-        team_ids.add(team_id)
-    except:
-        pass
-
-team_ids = sorted(team_ids)
-
-print(f"Equipos detectados: {len(team_ids)}")
-
-# ------------------------------------------------
-# 2️⃣ Scraping de jugadores
-# ------------------------------------------------
+# visitar la home primero para generar cookies
+scraper.get("https://sbbl.es")
 
 data = []
 
-for team_id in tqdm(team_ids):
+for team_id in tqdm(range(START_TEAM, END_TEAM + 1)):
 
-    url = f"{BASE_URL}/equipos/{team_id}"
+    url = f"https://sbbl.es/equipos/{team_id}"
 
     try:
-        response = scraper.get(url)
+        response = scraper.get(url, timeout=10)
     except:
         continue
 
@@ -88,11 +60,7 @@ for team_id in tqdm(team_ids):
             "player": player
         })
 
-    time.sleep(0.05)
-
-# ------------------------------------------------
-# 3️⃣ Crear dataset
-# ------------------------------------------------
+    time.sleep(DELAY)
 
 print("Jugadores encontrados:", len(data))
 
@@ -104,10 +72,6 @@ if df.empty:
 df.to_csv("sbbl_players.csv", index=False)
 
 print("Dataset guardado")
-
-# ------------------------------------------------
-# 4️⃣ Guardar fecha
-# ------------------------------------------------
 
 with open("last_update.txt", "w") as f:
     f.write(datetime.now().strftime("%d %b %Y %H:%M"))
