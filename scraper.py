@@ -62,7 +62,7 @@ for team_id in tqdm(range(START_TEAM, END_TEAM)):
         })
 
     time.sleep(DELAY)
-
+df = pd.DataFrame(data)
 df.to_csv("sbbl_players.csv", index=False)
 print("Dataset guardado")
 
