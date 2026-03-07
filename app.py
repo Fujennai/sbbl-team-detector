@@ -77,11 +77,15 @@ if st.button("Analizar"):
 
     resultado = resultado[resultado["total"] >= min_jugadores]
 
-    st.subheader("Equipos detectados")
+      st.subheader("Equipos detectados")
 
     if resultado.empty:
         st.warning("No se detectaron equipos.")
     else:
         resultado = resultado.sort_values("total", ascending=False)
 
-        st.dataframe(resultado, use_container_width=True)
+        st.dataframe(
+            resultado,
+            use_container_width=True,
+            hide_index=True
+        )
