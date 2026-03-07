@@ -33,7 +33,7 @@ session.get("https://sbbl.es")
 
 data = []
 
-for team_id in tqdm(range(START_TEAM, END_TEAM)):
+for team_id in tqdm(range(START_TEAM, END_TEAM + 1)):
 
     url = f"https://sbbl.es/equipos/{team_id}"
     response = session.get(url)
