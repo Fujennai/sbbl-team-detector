@@ -70,29 +70,6 @@ print("Jugadores encontrados:", len(data))
 df.to_csv("sbbl_players.csv", index=False)
 print("Dataset guardado")
 
-def detectar_equipos(lista_jugadores, df, min_jugadores=3):
-
-    jugadores = [j.lower() for j in lista_jugadores]
-
-    df_temp = df.copy()
-    df_temp["player_lower"] = df_temp["player"].str.lower()
-
-    coincidencias = df_temp[df_temp["player_lower"].isin(jugadores)]
-
-    resultado = (
-        coincidencias
-        .groupby("team")
-        .agg(
-            jugadores_encontrados=("player", list),
-            total=("player", "count")
-        )
-        .reset_index()
-    )
-
-    resultado = resultado[resultado["total"] >= min_jugadores]
-
-    return resultado.sort_values("total", ascending=False)
-
 from datetime import datetime
 
 with open("last_update.txt", "w") as f:
