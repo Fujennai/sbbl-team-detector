@@ -65,6 +65,8 @@ df = pd.DataFrame(data)
 
 if df.empty:
     raise Exception("No se extrajeron jugadores. Posible cambio en la web.")
+
+print("Jugadores encontrados:", len(data))
 df.to_csv("sbbl_players.csv", index=False)
 print("Dataset guardado")
 
