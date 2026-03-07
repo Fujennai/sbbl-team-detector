@@ -1,5 +1,6 @@
 name: Update dataset
-
+permissions:
+  contents: write
 on:
   schedule:
     - cron: "0 3 * * *"   # cada día a las 03:00
