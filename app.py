@@ -6,7 +6,10 @@ import os
 # Cargar dataset
 # -----------------------
 
-df = pd.read_csv("sbbl_players.csv")
+if os.path.exists("sbbl_players.csv") and os.path.getsize("sbbl_players.csv") > 0:
+    df = pd.read_csv("sbbl_players.csv")
+else:
+    df = pd.DataFrame(columns=["team_id", "team", "player"])
 
 # -----------------------
 # Cargar fecha actualización
@@ -80,4 +83,5 @@ if st.button("Analizar"):
         st.warning("No se detectaron equipos.")
     else:
         resultado = resultado.sort_values("total", ascending=False)
+
         st.dataframe(resultado, use_container_width=True)
