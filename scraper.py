@@ -63,6 +63,9 @@ for team_id in tqdm(range(START_TEAM, END_TEAM)):
 
     time.sleep(DELAY)
 df = pd.DataFrame(data)
+
+if df.empty:
+    raise Exception("No se extrajeron jugadores. Posible cambio en la web.")
 df.to_csv("sbbl_players.csv", index=False)
 print("Dataset guardado")
 
