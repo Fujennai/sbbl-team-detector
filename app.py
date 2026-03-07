@@ -77,7 +77,7 @@ if st.button("Analizar"):
 
     resultado = resultado[resultado["total"] >= min_jugadores]
 
-      st.subheader("Equipos detectados")
+    st.subheader("Equipos detectados")
 
     if resultado.empty:
         st.warning("No se detectaron equipos.")
