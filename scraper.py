@@ -1,4 +1,4 @@
-import requests
+import cloudscraper
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
@@ -9,7 +9,7 @@ START_TEAM = 1
 END_TEAM = 200
 DELAY = 0.1
 
-session = requests.Session()
+session = cloudscraper.create_scraper()
 
 session.headers.update({
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
