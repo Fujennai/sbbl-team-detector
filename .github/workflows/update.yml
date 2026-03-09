@@ -23,6 +23,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run scraper
+        env:
+            SBBL_COOKIE: ${{ secrets.SBBL_COOKIE }}
         run: python scraper.py
 
       - name: Commit updated data
